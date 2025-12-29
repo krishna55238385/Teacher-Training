@@ -30,6 +30,8 @@ export interface Scenario {
     status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
     difficulty?: string;
     score?: number;
+    toughTongueId?: string;
+    customEmbedUrl?: string;
 }
 
 export interface AuthState {

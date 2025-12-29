@@ -218,7 +218,20 @@ const ScenarioPage = () => {
     }
 
     // Active Iframe Experience
-    const embedUrl = `https://app.toughtongueai.com/embed/${id}?scenarioAccessToken=${accessToken}&userName=${encodeURIComponent(user?.name || '')}&userEmail=${encodeURIComponent(user?.email || '')}&hidePoweredBy=true&color=2563eb`;
+    // Active Iframe Experience
+    const ttId = scenario.toughTongueId || id;
+    const baseUrl = scenario.customEmbedUrl || `https://app.toughtongueai.com/embed/${ttId}`;
+
+    // Append parameters
+    const url = new URL(baseUrl);
+    if (accessToken) url.searchParams.set('scenarioAccessToken', accessToken);
+    if (user?.name) url.searchParams.set('userName', user.name);
+    if (user?.email) url.searchParams.set('userEmail', user.email);
+    url.searchParams.set('hidePoweredBy', 'true');
+    url.searchParams.set('color', '2563eb');
+    url.searchParams.set('skipPrecheck', 'true'); // Added per user request
+
+    const embedUrl = url.toString();
 
     return (
         <div className="flex flex-col h-[calc(100vh-4rem)] bg-black overflow-hidden relative">

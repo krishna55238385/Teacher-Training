@@ -1,0 +1,23 @@
+# CodeRabbit Configuration File
+# For more information, visit https://docs.coderabbit.ai/getting-started/configure-coderabbit
+
+language: "en-US"
+
+reviews:
+  # Review profile: "chill" or "assertive"
+  profile: "assertive"
+  # Enable/disable auto-review for PRs
+  auto_review: true
+
+# Path filters to exclude files from review
+path_filters:
+  - "node_modules/**"
+  - "dist/**"
+  - "build/**"
+  - "**/*.min.js"
+  - "**/*.lock"
+
+# Branches to ignore
+ignored_branches:
+  - "main"
+  - "master"

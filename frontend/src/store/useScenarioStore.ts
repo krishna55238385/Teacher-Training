@@ -29,6 +29,8 @@ const INITIAL_SCENARIOS: Scenario[] = [
         description: 'Roleplay a renewal conversation with a parent hesitant due to perceived lack of improvement in English communication skills. Address objections convincingly.',
         difficulty: 'Advanced',
         status: 'NOT_STARTED',
+        toughTongueId: '693a7c1507d90d92fea80744',
+        customEmbedUrl: 'https://bambinos.app.toughtongueai.com/embed/693a7c1507d90d92fea80744',
     },
     {
         id: '4',
