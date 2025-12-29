@@ -34,7 +34,7 @@ const INITIAL_SCENARIOS: Scenario[] = [
         id: '4',
         title: 'Coach: The Perfect Renewal Call',
         description: 'Learn the best practices for a renewal call. Focus on value proposition, celebrating student wins, and closing the renewal effectively.',
-        difficulty: 'Istermediate',
+        difficulty: 'Intermediate',
         status: 'NOT_STARTED',
     },
 ];
@@ -49,9 +49,9 @@ export const useScenarioStore = create<ScenarioState>()(
                     set({ scenarios: INITIAL_SCENARIOS });
                 }
             },
-            updateScenarioStatus: (id, status, score) => {
-                set((state) => ({
-                    scenarios: state.scenarios.map((s) =>
+            updateScenarioStatus: (id: string, status: Scenario['status'], score?: number) => {
+                set((state: ScenarioState) => ({
+                    scenarios: state.scenarios.map((s: Scenario) =>
                         s.id === id ? { ...s, status, score } : s
                     ),
                 }));

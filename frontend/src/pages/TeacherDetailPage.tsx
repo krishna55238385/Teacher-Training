@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useParams, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAdminStore } from '../store/useAdminStore';
 import Button from '../components/common/Button';
@@ -11,8 +12,18 @@ const TeacherDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const location = useLocation();
-    const { teachers } = useAdminStore();
+    const { teachers, fetchTeacherById, isLoading } = useAdminStore();
     const teacher = teachers.find(t => t.id === id);
+
+    useEffect(() => {
+        if (!teacher && id) {
+            fetchTeacherById(id);
+        }
+    }, [id, teacher, fetchTeacherById]);
+
+    if (isLoading && !teacher) {
+        return <div className="text-center p-8">Loading teacher details...</div>;
+    }
 
     if (!teacher) {
         return <div className="text-center p-8">Teacher not found</div>;

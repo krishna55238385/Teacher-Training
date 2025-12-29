@@ -17,13 +17,13 @@ const AdminOverallResult = () => {
 
     if (!teacher) return <div>Teacher not found</div>;
 
-    // Mock Overall Data
+    // Use real data from teacher if available
     const overallStats = {
-        totalScore: 88,
-        percentile: 92,
+        totalScore: teacher.scenarioProgress.reduce((sum, p) => sum + (p.score || 0), 0) / (teacher.scenarioProgress.length || 1),
+        percentile: 92, // Still mock for now as we don't have batch stats
         rank: 4,
         totalCandidates: 156,
-        recommendation: 'Highly Recommended'
+        recommendation: teacher.evaluation ? 'Highly Recommended' : 'Pending Evaluation'
     };
 
     const skillRadarData = [
@@ -35,12 +35,11 @@ const AdminOverallResult = () => {
         { subject: 'Subject Matter', A: 65, fullMark: 150 },
     ];
 
-    const performanceData = [
-        { name: 'Scenario 1', score: 85, avg: 75 },
-        { name: 'Scenario 2', score: 92, avg: 78 },
-        { name: 'Scenario 3', score: 78, avg: 72 },
-        { name: 'Scenario 4', score: 88, avg: 80 },
-    ];
+    const performanceData = teacher.scenarioProgress.map((p, idx) => ({
+        name: `Scenario ${idx + 1}`,
+        score: p.score || 0,
+        avg: 75 // Mock average
+    }));
 
     return (
         <div className="space-y-6 animate-fadeIn">
@@ -51,8 +50,8 @@ const AdminOverallResult = () => {
                         <div className="p-2 bg-blue-50 rounded-lg"><Award className="w-6 h-6 text-blue-600" /></div>
                         <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">+4% vs avg</span>
                     </div>
-                    <div className="text-3xl font-bold text-gray-900">{overallStats.totalScore}/100</div>
-                    <div className="text-sm text-gray-500 mt-1">Overall Score</div>
+                    <div className="text-3xl font-bold text-gray-900">{overallStats.totalScore.toFixed(0)}/100</div>
+                    <div className="text-sm text-gray-500 mt-1">Average Score</div>
                 </Card>
                 <Card className="p-6 border-none shadow-lg bg-white">
                     <div className="flex justify-between items-start mb-4">
@@ -127,23 +126,25 @@ const AdminOverallResult = () => {
                     <div className="space-y-4">
                         <div>
                             <h3 className="text-lg font-bold text-gray-900">AI Executive Summary</h3>
-                            <p className="text-sm text-gray-500">Generated based on analysis of 4 scenarios and 12 assessments</p>
+                            <p className="text-sm text-gray-500">
+                                {teacher.evaluation
+                                    ? 'Generated based on analysis of completed scenarios'
+                                    : 'Complete all 4 scenarios to generate summary'}
+                            </p>
                         </div>
                         <div className="prose prose-sm text-gray-600 max-w-none">
-                            <p>
-                                <span className="font-semibold text-gray-900">{teacher.name}</span> demonstrates exceptional aptitude in
-                                <span className="font-semibold text-gray-900"> Classroom Management</span> and <span className="font-semibold text-gray-900">Student Engagement</span>.
-                                Their ability to de-escalate conflicts (Scenario 4) was particularly noteworthy, scoring in the top 5% of candidates.
-                            </p>
-                            <p className="mt-2">
-                                While their instructional delivery is strong, there is a minor opportunity for growth in <span className="font-semibold text-gray-900">Differentiation strategies</span> for advanced learners.
-                                However, their high adaptability score suggests they will respond well to coaching in this area.
-                            </p>
-                            <div className="mt-4 flex flex-wrap gap-2">
-                                <span className="px-3 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-full border border-green-100">Strong Communicator</span>
-                                <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">Empathetic Leader</span>
-                                <span className="px-3 py-1 bg-purple-50 text-purple-700 text-xs font-medium rounded-full border border-purple-100">Tech Savvy</span>
-                            </div>
+                            {teacher.evaluation ? (
+                                <p className="whitespace-pre-wrap">{teacher.evaluation.llmSummary}</p>
+                            ) : (
+                                <p>Summary will be available once the teacher completes all training scenarios.</p>
+                            )}
+                            {teacher.evaluation && (
+                                <div className="mt-4 flex flex-wrap gap-2">
+                                    <span className="px-3 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-full border border-green-100">Strong Communicator</span>
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">Empathetic Leader</span>
+                                    <span className="px-3 py-1 bg-purple-50 text-purple-700 text-xs font-medium rounded-full border border-purple-100">Tech Savvy</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -18,6 +18,9 @@ export interface TeacherProfile extends User {
         status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
         score?: number;
     }[];
+    evaluation?: {
+        llmSummary: string;
+    };
 }
 
 export interface Scenario {
