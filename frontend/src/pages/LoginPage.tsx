@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import { AuthService } from '../services/AuthService';
 import { AuthRepository } from '../repositories/AuthRepository';
@@ -129,10 +129,7 @@ const LoginPage = () => {
                 </CardContent>
                 <CardFooter className="justify-center border-t border-gray-100 pt-6">
                     <p className="text-sm text-gray-500">
-                        Don't have an account?{' '}
-                        <Link to="/apply" className="text-primary-600 hover:text-primary-700 font-medium">
-                            Apply now
-                        </Link>
+                        Contact your administrator to get access to the platform.
                     </p>
                 </CardFooter>
             </Card>

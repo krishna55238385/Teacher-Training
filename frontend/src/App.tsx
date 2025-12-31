@@ -2,7 +2,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
-import ApplicationPage from './pages/ApplicationPage';
 import TeacherDashboard from './pages/TeacherDashboard';
 import ScenarioPage from './pages/ScenarioPage';
 import AdminDashboard from './pages/AdminDashboard';
@@ -21,7 +20,6 @@ function App() {
         {/* Public Routes */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/apply" element={<ApplicationPage />} />
           <Route path="/login" element={<LoginPage />} />
         </Route>
 

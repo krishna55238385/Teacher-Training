@@ -34,7 +34,7 @@ const LandingPage = () => {
                         Get instant feedback and improve your teaching skills before stepping into a classroom.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <Link to="/apply">
+                        <Link to="/login">
                             <Button size="lg" className="w-full sm:w-auto">
                                 Start Your Journey <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
@@ -115,8 +115,8 @@ const LandingPage = () => {
                                 ))}
                             </ul>
                             <div className="mt-8">
-                                <Link to="/apply">
-                                    <Button size="lg">Apply Now</Button>
+                                <Link to="/login">
+                                    <Button size="lg">Get Started</Button>
                                 </Link>
                             </div>
                         </div>
@@ -137,9 +137,9 @@ const LandingPage = () => {
                     <p className="text-xl text-primary-100 mb-10">
                         Join thousands of educators who are mastering their craft with AI-powered training.
                     </p>
-                    <Link to="/apply">
+                    <Link to="/login">
                         <Button size="lg" variant="secondary" className="bg-white text-primary-600 hover:bg-gray-100 border-transparent">
-                            Apply for Access
+                            Get Started
                         </Button>
                     </Link>
                 </div>

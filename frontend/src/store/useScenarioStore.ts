@@ -1,11 +1,16 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Scenario } from '../types';
+import api from '../services/api';
 
 interface ScenarioState {
     scenarios: Scenario[];
+    isLoading: boolean;
+    error: string | null;
     initializeScenarios: () => void;
+    fetchScenarios: () => Promise<void>;
     updateScenarioStatus: (id: string, status: Scenario['status'], score?: number) => void;
+    syncWithBackend: (id: string, status: Scenario['status'], score?: number) => Promise<void>;
 }
 
 const INITIAL_SCENARIOS: Scenario[] = [
@@ -51,10 +56,29 @@ export const useScenarioStore = create<ScenarioState>()(
     persist(
         (set, get) => ({
             scenarios: INITIAL_SCENARIOS,
+            isLoading: false,
+            error: null,
             initializeScenarios: () => {
                 const currentScenarios = get().scenarios;
                 if (currentScenarios.length === 0) {
                     set({ scenarios: INITIAL_SCENARIOS });
+                }
+            },
+            fetchScenarios: async () => {
+                set({ isLoading: true, error: null });
+                try {
+                    const response = await api.get('/scenarios');
+                    if (response.data.success && response.data.scenarios) {
+                        set({ scenarios: response.data.scenarios, isLoading: false });
+                    } else {
+                        // Fallback to initial scenarios if API fails
+                        set({ scenarios: INITIAL_SCENARIOS, isLoading: false });
+                    }
+                } catch (error) {
+                    const errorMessage = error instanceof Error ? error.message : 'Failed to fetch scenarios';
+                    console.warn('Failed to fetch scenarios from API, using local data:', error);
+                    // Fallback to initial scenarios on error
+                    set({ scenarios: INITIAL_SCENARIOS, isLoading: false, error: errorMessage });
                 }
             },
             updateScenarioStatus: (id: string, status: Scenario['status'], score?: number) => {
@@ -63,6 +87,18 @@ export const useScenarioStore = create<ScenarioState>()(
                         s.id === id ? { ...s, status, score } : s
                     ),
                 }));
+            },
+            syncWithBackend: async (id: string, status: Scenario['status'], score?: number) => {
+                try {
+                    // Update status via API
+                    await api.put(`/scenarios/${id}/status`, { status });
+                    // Update local state
+                    get().updateScenarioStatus(id, status, score);
+                } catch (error) {
+                    console.error('Failed to sync scenario status with backend:', error);
+                    // Still update local state even if backend fails
+                    get().updateScenarioStatus(id, status, score);
+                }
             },
         }),
         {
