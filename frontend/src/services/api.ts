@@ -3,7 +3,7 @@ import { useAuthStore } from '../store/useAuthStore';
 
 // Create generic axios instance
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+    baseURL: import.'https://teachertraining.bambinos.live',
     headers: {
         'Content-Type': 'application/json',
     },
