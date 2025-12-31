@@ -15,6 +15,8 @@ const INITIAL_SCENARIOS: Scenario[] = [
         description: 'Navigate a challenging Parent-Teacher Meeting where a parent is concerned about their child\'s progress. Practice active listening and evidence-based feedback.',
         difficulty: 'Intermediate',
         status: 'NOT_STARTED',
+        toughTongueId: '693877e7b8892d3f7b91eb31',
+        customEmbedUrl: 'https://bambinos.app.toughtongueai.com/embed/693877e7b8892d3f7b91eb31?skipPrecheck=true',
     },
     {
         id: '2',
@@ -22,6 +24,8 @@ const INITIAL_SCENARIOS: Scenario[] = [
         description: 'Master the structural framework for conducting effective PTMs. Focus on the "Sandwich Method" of feedback and setting actionable goals.',
         difficulty: 'Advanced',
         status: 'NOT_STARTED',
+        toughTongueId: '6939d23e07d90d92fea80199',
+        customEmbedUrl: 'https://bambinos.app.toughtongueai.com/embed/6939d23e07d90d92fea80199?skipPrecheck=true',
     },
     {
         id: '3',
@@ -30,7 +34,7 @@ const INITIAL_SCENARIOS: Scenario[] = [
         difficulty: 'Advanced',
         status: 'NOT_STARTED',
         toughTongueId: '693a7c1507d90d92fea80744',
-        customEmbedUrl: 'https://bambinos.app.toughtongueai.com/embed/693a7c1507d90d92fea80744',
+        customEmbedUrl: 'https://bambinos.app.toughtongueai.com/embed/693a7c1507d90d92fea80744?skipPrecheck=true',
     },
     {
         id: '4',
@@ -38,6 +42,8 @@ const INITIAL_SCENARIOS: Scenario[] = [
         description: 'Learn the best practices for a renewal call. Focus on value proposition, celebrating student wins, and closing the renewal effectively.',
         difficulty: 'Intermediate',
         status: 'NOT_STARTED',
+        toughTongueId: '6942c17a25f8fcc9bc250d03',
+        customEmbedUrl: 'https://bambinos.app.toughtongueai.com/embed/6942c17a25f8fcc9bc250d03?skipPrecheck=true',
     },
 ];
 

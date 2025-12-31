@@ -72,6 +72,13 @@ const ScenarioPage = () => {
     };
 
     const handleStart = async () => {
+        // If scenario has customEmbedUrl, skip token fetch and go directly to iframe
+        if (scenario?.customEmbedUrl) {
+            setSessionState('active');
+            return;
+        }
+
+        // Otherwise, try to fetch token from backend
         setIsLoadingToken(true);
         try {
             const response = await api.get(`/scenarios/${id}/token`);
@@ -79,6 +86,8 @@ const ScenarioPage = () => {
             setSessionState('active');
         } catch (error) {
             console.error('Failed to fetch scenario access token:', error);
+            // Show error to user
+            alert('Failed to start scenario. Please try again.');
         } finally {
             setIsLoadingToken(false);
         }
@@ -217,7 +226,6 @@ const ScenarioPage = () => {
         );
     }
 
-    // Active Iframe Experience
     // Active Iframe Experience
     const ttId = scenario.toughTongueId || id;
     const baseUrl = scenario.customEmbedUrl || `https://app.toughtongueai.com/embed/${ttId}`;
