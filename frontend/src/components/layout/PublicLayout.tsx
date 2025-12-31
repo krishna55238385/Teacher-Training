@@ -19,14 +19,10 @@ const PublicLayout = () => {
                     <nav className="hidden md:flex items-center space-x-8">
                         <a href="#how-it-works" className="text-gray-600 hover:text-primary-600 font-medium transition-colors">How it Works</a>
                         <a href="#benefits" className="text-gray-600 hover:text-primary-600 font-medium transition-colors">Benefits</a>
-                        <Link to="/apply" className="text-gray-600 hover:text-primary-600 font-medium transition-colors">Apply</Link>
                     </nav>
 
                     <div className="flex items-center space-x-4">
                         <Link to="/login">
-                            <Button variant="ghost">Log In</Button>
-                        </Link>
-                        <Link to="/apply">
                             <Button>Get Started</Button>
                         </Link>
                     </div>

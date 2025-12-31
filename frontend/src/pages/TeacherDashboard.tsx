@@ -17,15 +17,25 @@ const ScenarioIcon = ({ title, className }: { title: string, className?: string 
 
 const TeacherDashboard = () => {
     const { user } = useAuthStore();
-    const { scenarios, initializeScenarios } = useScenarioStore();
+    const { scenarios, isLoading, fetchScenarios, initializeScenarios } = useScenarioStore();
 
     React.useEffect(() => {
-        initializeScenarios();
-    }, [initializeScenarios]);
+        // Fetch scenarios from backend on mount
+        fetchScenarios().catch(() => {
+            // If fetch fails, fallback to local initialization
+            initializeScenarios();
+        });
+    }, [fetchScenarios, initializeScenarios]);
 
     const completedCount = scenarios.filter(s => s.status === 'COMPLETED').length;
     const progressPercentage = (completedCount / scenarios.length) * 100;
     const avgScore = completedCount > 0 ? Math.round(scenarios.reduce((acc, s) => acc + (s.score || 0), 0) / completedCount) : 0;
+
+    // Get scenario index for display (1-based)
+    const getScenarioNumber = (scenarioId: string) => {
+        const index = scenarios.findIndex(s => s.id === scenarioId);
+        return index + 1;
+    };
 
     return (
         <div className="min-h-full flex flex-col p-4 sm:p-6 md:p-8 bg-gray-50/50 backdrop-blur-sm font-sans">
@@ -98,6 +108,15 @@ const TeacherDashboard = () => {
 
             {/* Scenarios Grid */}
             <div className="flex-1 min-h-0">
+                {isLoading ? (
+                    <div className="py-20 text-center bg-white rounded-2xl border-2 border-dashed border-gray-200">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 mb-4 text-gray-400">
+                            <Sparkles className="w-8 h-8 animate-pulse" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900">Loading scenarios...</h3>
+                        <p className="text-gray-500 mt-1">Please wait while we fetch your progress.</p>
+                    </div>
+                ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
                     {scenarios.length === 0 ? (
                         <div className="col-span-full py-20 text-center bg-white rounded-2xl border-2 border-dashed border-gray-200">
@@ -111,6 +130,7 @@ const TeacherDashboard = () => {
                         scenarios.map((scenario) => {
                             const isCompleted = scenario.status === 'COMPLETED';
                             const isInProgress = scenario.status === 'IN_PROGRESS';
+                            const scenarioNumber = getScenarioNumber(scenario.id);
 
                             return (
                                 <Link
@@ -130,13 +150,26 @@ const TeacherDashboard = () => {
                                                 <ScenarioIcon title={scenario.title} />
                                             </div>
 
-                                            <div className={cn(
-                                                "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
-                                                isCompleted ? "bg-green-100 text-green-700" :
-                                                    isInProgress ? "bg-blue-100 text-blue-600" :
-                                                        "bg-gray-100 text-gray-500"
-                                            )}>
-                                                {scenario.status.replace('_', ' ')}
+                                            <div className="flex flex-col items-end gap-2">
+                                                {/* Scenario number indicator */}
+                                                <div className={cn(
+                                                    "px-3 py-1 rounded-full text-xs font-bold",
+                                                    isCompleted ? "bg-green-100 text-green-700" :
+                                                        isInProgress ? "bg-blue-100 text-blue-600" :
+                                                            "bg-gray-100 text-gray-500"
+                                                )}>
+                                                    {scenarioNumber}/{scenarios.length}
+                                                </div>
+                                                
+                                                {/* Status badge */}
+                                                <div className={cn(
+                                                    "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
+                                                    isCompleted ? "bg-green-100 text-green-700" :
+                                                        isInProgress ? "bg-blue-100 text-blue-600" :
+                                                            "bg-gray-100 text-gray-500"
+                                                )}>
+                                                    {isCompleted ? 'Completed' : scenario.status.replace('_', ' ')}
+                                                </div>
                                             </div>
                                         </div>
 
@@ -169,6 +202,7 @@ const TeacherDashboard = () => {
                         })
                     )}
                 </div>
+                )}
             </div>
         </div>
     );

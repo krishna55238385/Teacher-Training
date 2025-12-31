@@ -2,13 +2,14 @@ import React from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
+import { AuthService } from '../services/AuthService';
+import { AuthRepository } from '../repositories/AuthRepository';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '../components/common/Card';
 import Alert from '../components/common/Alert';
-import type { User, Role } from '../types';
 
 const loginSchema = z.object({
     email: z.string().email('Invalid email address'),
@@ -16,6 +17,9 @@ const loginSchema = z.object({
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
+
+const authRepository = new AuthRepository();
+const authService = new AuthService(authRepository);
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -54,32 +58,29 @@ const LoginPage = () => {
         setIsLoading(true);
         setError(null);
         try {
-            // Mock Login Logic
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            // Determine role based on email for demo purposes
-            let role: Role = 'TEACHER';
-            if (data.email.includes('admin')) {
-                role = 'ADMIN';
-            }
-
-            const mockUser: User = {
-                id: '1',
-                name: data.email.split('@')[0],
+            const result = await authService.login({
                 email: data.email,
-                role: role,
-                avatar: undefined
-            };
+                password: data.password,
+            });
 
-            login('mock-jwt-token', mockUser);
+            login(result.token, result.user);
 
-            if (role === 'ADMIN') {
-                navigate('/admin/dashboard');
+            if (result.user.role === 'ADMIN') {
+                navigate('/admin/dashboard', { replace: true });
             } else {
-                navigate('/dashboard');
+                navigate('/dashboard', { replace: true });
             }
         } catch (err) {
-            setError('Invalid email or password');
+            let errorMessage = 'Invalid email or password';
+            if (err instanceof Error) {
+                errorMessage = err.message;
+            }
+            // Check if it's an axios error
+            if (err && typeof err === 'object' && 'response' in err) {
+                const axiosError = err as { response?: { data?: { message?: string } } };
+                errorMessage = axiosError.response?.data?.message || errorMessage;
+            }
+            setError(errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -97,7 +98,7 @@ const LoginPage = () => {
                 <CardContent className="space-y-4 pt-4">
                     {appliedSuccess && (
                         <Alert type="success" title="Application Submitted">
-                            Your application has been received. You can mock login now.
+                            Your application has been received. You can login now.
                         </Alert>
                     )}
                     {error && (
@@ -125,19 +126,10 @@ const LoginPage = () => {
                             Sign In
                         </Button>
                     </form>
-
-                    <div className="text-center text-sm text-gray-500 mt-4">
-                        <p className="mb-2">Demo Credentials:</p>
-                        <p>Teacher: teacher@demo.com / password</p>
-                        <p>Admin: admin@demo.com / password</p>
-                    </div>
                 </CardContent>
                 <CardFooter className="justify-center border-t border-gray-100 pt-6">
                     <p className="text-sm text-gray-500">
-                        Don't have an account?{' '}
-                        <Link to="/apply" className="text-primary-600 hover:text-primary-700 font-medium">
-                            Apply now
-                        </Link>
+                        Contact your administrator to get access to the platform.
                     </p>
                 </CardFooter>
             </Card>

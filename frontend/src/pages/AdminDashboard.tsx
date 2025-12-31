@@ -4,7 +4,7 @@ import { useAdminStore } from '../store/useAdminStore';
 import { Card, CardContent } from '../components/common/Card';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
-import { Search, Eye, Download, UserPlus, Users, Target, Activity, MoreHorizontal } from 'lucide-react';
+import { Search, Eye, Download, UserPlus, Users, Target, Activity } from 'lucide-react';
 import { cn } from '../utils/cn';
 
 const AVATAR_COLORS = [
