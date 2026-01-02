@@ -31,15 +31,23 @@ const ScenarioPage = () => {
     }, [scenario]);
 
     const handleSessionComplete = React.useCallback(async (sessionId: string) => {
+        console.log('🚀 handleSessionComplete called with sessionId:', sessionId);
+        console.log('📋 Current scenario id:', id);
+        
         try {
             // Try to notify backend to fetch results and trigger evaluation
             let score: number | null = null;
             
             try {
+                console.log('📡 Making API call to /scenarios/submit...');
+                console.log('📦 Request payload:', { sessionId, scenarioId: id });
+                
                 const response = await api.post('/scenarios/submit', {
                     sessionId,
                     scenarioId: id
                 });
+                
+                console.log('✅ API Response received:', response.data);
                 
                 if (response.data.success) {
                     score = response.data.score ?? null;
@@ -53,6 +61,7 @@ const ScenarioPage = () => {
             } catch (backendError) {
                 // If backend is not available, use a mock score
                 // This allows the system to work even without backend
+                console.error('❌ API Call failed:', backendError);
                 console.warn('Backend not available, using local completion:', backendError);
                 score = Math.floor(Math.random() * 20) + 70; // Random score 70-90
                 setLastScore(score);
@@ -94,6 +103,8 @@ const ScenarioPage = () => {
                         break;
                     case 'onSubmit':
                         // Session completed and data submitted
+                        console.log('🎯 onSubmit received, calling handleSessionComplete...');
+                        console.log('📝 SessionId from event:', data.sessionId);
                         handleSessionComplete(data.sessionId);
                         break;
                 }

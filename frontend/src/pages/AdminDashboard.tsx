@@ -70,6 +70,34 @@ const AdminDashboard = () => {
         : 0;
     const activeTeachers = teachers.filter((t: any) => t.scenarioProgress?.some((s: any) => s.status === 'IN_PROGRESS')).length;
 
+    // Helper function to get last activity date
+    const getLastActivity = (teacher: any) => {
+        const attempts = teacher.scenarioProgress || [];
+        if (attempts.length === 0) return null;
+        
+        const dates = attempts
+            .map((a: any) => a.updated_at ? new Date(a.updated_at) : a.created_at ? new Date(a.created_at) : null)
+            .filter((d: Date | null) => d !== null) as Date[];
+        
+        if (dates.length === 0) return null;
+        
+        const latest = new Date(Math.max(...dates.map(d => d.getTime())));
+        return latest;
+    };
+
+    // Helper function to format relative time
+    const formatRelativeTime = (date: Date) => {
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 0) return 'Today';
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays} days ago`;
+        if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+        return `${Math.floor(diffDays / 30)} months ago`;
+    };
+
     return (
         <div className="p-4 sm:p-6 md:p-10 space-y-10 bg-[#F9FAFB] min-h-full font-sans">
             {/* Header section - Refined alignment */}
@@ -169,6 +197,7 @@ const AdminDashboard = () => {
                                         {paginatedTeachers.map((teacher: any, idx: number) => {
                                             const completedCount = teacher.scenarioProgress?.filter((s: any) => s.status === 'COMPLETED').length || 0;
                                             const progress = (completedCount / 4) * 100;
+                                            const lastActivity = getLastActivity(teacher);
 
                                             return (
                                                 <tr key={teacher.id} className="hover:bg-gray-50/50 transition-all duration-200 group">
@@ -183,6 +212,11 @@ const AdminDashboard = () => {
                                                             <div className="flex flex-col gap-1">
                                                                 <div className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors text-lg leading-tight">{teacher.name}</div>
                                                                 <div className="text-sm text-gray-500 font-medium">{teacher.email}</div>
+                                                                {lastActivity && (
+                                                                    <div className="text-xs text-gray-400 mt-0.5">
+                                                                        Last active: {formatRelativeTime(lastActivity)}
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </td>
