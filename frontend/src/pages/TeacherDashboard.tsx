@@ -129,7 +129,6 @@ const TeacherDashboard = () => {
                     ) : (
                         scenarios.map((scenario) => {
                             const isCompleted = scenario.status === 'COMPLETED';
-                            const isInProgress = scenario.status === 'IN_PROGRESS';
                             const scenarioNumber = getScenarioNumber(scenario.id);
 
                             return (
@@ -144,8 +143,7 @@ const TeacherDashboard = () => {
                                             <div className={cn(
                                                 "w-[48px] h-[48px] rounded-xl flex items-center justify-center transition-all duration-500",
                                                 isCompleted ? "bg-green-50 text-green-600" :
-                                                    isInProgress ? "bg-blue-50 text-blue-600" :
-                                                        "bg-gray-50 text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600"
+                                                    "bg-gray-50 text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600"
                                             )}>
                                                 <ScenarioIcon title={scenario.title} />
                                             </div>
@@ -155,8 +153,7 @@ const TeacherDashboard = () => {
                                                 <div className={cn(
                                                     "px-3 py-1 rounded-full text-xs font-bold",
                                                     isCompleted ? "bg-green-100 text-green-700" :
-                                                        isInProgress ? "bg-blue-100 text-blue-600" :
-                                                            "bg-gray-100 text-gray-500"
+                                                        "bg-gray-100 text-gray-500"
                                                 )}>
                                                     {scenarioNumber}/{scenarios.length}
                                                 </div>
@@ -165,8 +162,7 @@ const TeacherDashboard = () => {
                                                 <div className={cn(
                                                     "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
                                                     isCompleted ? "bg-green-100 text-green-700" :
-                                                        isInProgress ? "bg-blue-100 text-blue-600" :
-                                                            "bg-gray-100 text-gray-500"
+                                                        "bg-gray-100 text-gray-500"
                                                 )}>
                                                     {isCompleted ? 'Completed' : scenario.status.replace('_', ' ')}
                                                 </div>
@@ -182,7 +178,8 @@ const TeacherDashboard = () => {
                                         </p>
 
                                         <div className="flex items-center justify-between mt-auto pt-6 border-t border-gray-50">
-                                            {scenario.score ? (
+                                            {/* Don't show score for completed scenarios */}
+                                            {!isCompleted && scenario.score ? (
                                                 <div className="flex items-center gap-1.5 bg-amber-50/50 px-3 py-1.5 rounded-lg">
                                                     <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                                                     <span className="text-sm font-bold text-amber-700">{scenario.score}% Score</span>
@@ -192,7 +189,7 @@ const TeacherDashboard = () => {
                                             )}
 
                                             <button className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-md hover:bg-blue-700 active:scale-95 transition-all duration-200">
-                                                {isCompleted ? 'Review' : 'Start'}
+                                                {isCompleted ? 'Completed' : 'Start'}
                                                 <ArrowRight className="w-4 h-4" />
                                             </button>
                                         </div>

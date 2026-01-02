@@ -1,5 +1,20 @@
 export type Role = 'TEACHER' | 'ADMIN';
 
+export interface EvaluationData {
+    final_score?: number;
+    overall_score?: number | string;
+    strengths?: string | string[];
+    weaknesses?: string | string[];
+    improvement_areas?: string | string[];
+    strength_points?: string | string[];
+    detailed_feedback?: string;
+    llmSummary?: string;
+    report_card?: Record<string, number | { score: number; description?: string }>;
+    duration?: number;
+    completed_at?: string;
+    [key: string]: unknown;
+}
+
 export interface User {
     id: string;
     name: string;
@@ -15,10 +30,10 @@ export interface TeacherProfile extends User {
     institution?: string;
     scenarioProgress: {
         scenarioId: string;
-        status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
+        status: 'NOT_STARTED' | 'COMPLETED';
         score?: number | null;
         session_id?: string | null;
-        evaluation?: Record<string, any> | null;
+        evaluation?: EvaluationData | null;
         created_at?: string;
         updated_at?: string;
     }[];
@@ -31,7 +46,7 @@ export interface Scenario {
     id: string;
     title: string;
     description: string;
-    status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
+    status: 'NOT_STARTED' | 'COMPLETED';
     difficulty?: string;
     score?: number;
     toughTongueId?: string;

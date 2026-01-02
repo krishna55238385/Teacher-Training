@@ -25,10 +25,10 @@ const ScenarioPage = () => {
     // Initialize state based on scenario status
     React.useEffect(() => {
         if (scenario?.status === 'COMPLETED') {
-            setSessionState('completed');
-            setLastScore(scenario.score || null);
+            // Redirect immediately if already completed
+            navigate('/dashboard');
         }
-    }, [scenario]);
+    }, [scenario, navigate]);
 
     const handleSessionComplete = React.useCallback(async (sessionId: string) => {
         console.log('🚀 handleSessionComplete called with sessionId:', sessionId);
@@ -70,20 +70,14 @@ const ScenarioPage = () => {
                 updateScenarioStatus(id!, 'COMPLETED', score ?? undefined);
             }
 
-            setSessionState('completed');
-            
-            // Auto-redirect to dashboard after completion
-            setTimeout(() => {
-                navigate('/dashboard');
-            }, 1500); // Small delay to show completion briefly, then redirect
+            // Redirect immediately to dashboard after completion
+            navigate('/dashboard');
         } catch (error) {
             console.error('Failed to process session completion:', error);
             // Fallback: still mark as completed and redirect even if everything fails
             updateScenarioStatus(id!, 'COMPLETED');
-            setSessionState('completed');
-            setTimeout(() => {
-                navigate('/dashboard');
-            }, 1500);
+            // Redirect immediately
+            navigate('/dashboard');
         }
     }, [id, navigate, updateScenarioStatus]);
 
@@ -98,9 +92,6 @@ const ScenarioPage = () => {
                 console.log('Tough Tongue Event:', data.event, data);
 
                 switch (data.event) {
-                    case 'onStart':
-                        updateScenarioStatus(id!, 'IN_PROGRESS');
-                        break;
                     case 'onSubmit':
                         // Session completed and data submitted
                         console.log('🎯 onSubmit received, calling handleSessionComplete...');

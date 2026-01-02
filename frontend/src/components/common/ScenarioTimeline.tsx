@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../utils/cn';
 import { motion } from 'framer-motion';
-import { CheckCircle, PlayCircle, FileText } from 'lucide-react';
+import { CheckCircle, FileText } from 'lucide-react';
 
 interface Scenario {
     title: string;
@@ -48,7 +48,6 @@ const ScenarioTimeline = ({ scenarios, currentScenarioIndex, teacherId, isSummar
                 {scenarios.map((scenario, idx) => {
                     const isCompleted = scenario.status === 'COMPLETED';
                     const isCurrent = idx === currentScenarioIndex && !isSummary;
-                    const inProgress = scenario.status === 'IN_PROGRESS';
 
                     return (
                         <button
@@ -74,8 +73,6 @@ const ScenarioTimeline = ({ scenarios, currentScenarioIndex, teacherId, isSummar
                                 {/* Status Indicator Icon */}
                                 {isCompleted ? (
                                     <CheckCircle className={cn("w-3.5 h-3.5", isCurrent ? "text-blue-200" : "text-emerald-500")} />
-                                ) : inProgress ? (
-                                    <PlayCircle className={cn("w-3.5 h-3.5", isCurrent ? "text-blue-200" : "text-blue-500")} />
                                 ) : (
                                     <span className={cn("w-1.5 h-1.5 rounded-full ml-1 mr-1", isCurrent ? "bg-blue-300" : "bg-gray-300")} />
                                 )}
