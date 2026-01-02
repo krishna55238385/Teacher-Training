@@ -9,14 +9,18 @@ export interface User {
 }
 
 export interface TeacherProfile extends User {
-    phone: string;
-    subject: string;
-    yearsOfExperience: number;
-    institution: string;
+    phone?: string;
+    subject?: string;
+    yearsOfExperience?: number;
+    institution?: string;
     scenarioProgress: {
         scenarioId: string;
         status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
-        score?: number;
+        score?: number | null;
+        session_id?: string | null;
+        evaluation?: Record<string, any> | null;
+        created_at?: string;
+        updated_at?: string;
     }[];
     evaluation?: {
         llmSummary: string;
