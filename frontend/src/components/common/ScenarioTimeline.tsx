@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../utils/cn';
 import { motion } from 'framer-motion';
-import { CheckCircle, PlayCircle, FileText } from 'lucide-react';
+import { CheckCircle, FileText } from 'lucide-react';
 
 interface Scenario {
     title: string;
