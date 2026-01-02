@@ -23,7 +23,7 @@ const Skeleton = ({ className }: { className?: string }) => (
 const AdminDashboard = () => {
     const { teachers, fetchTeachers, isLoading: isStoreLoading } = useAdminStore();
     const [searchTerm, setSearchTerm] = React.useState('');
-    const [statusFilter, setStatusFilter] = React.useState<'All' | 'In Progress' | 'Completed' | 'Not Started'>('All');
+    const [statusFilter, setStatusFilter] = React.useState<'All' | 'Completed' | 'Not Started'>('All');
     const [isLoading, setIsLoading] = React.useState(true);
     const [currentPage, setCurrentPage] = React.useState(1);
     const itemsPerPage = 5;
@@ -50,11 +50,9 @@ const AdminDashboard = () => {
         if (statusFilter === 'All') return true;
 
         const completedCount = teacher.scenarioProgress?.filter((s: any) => s.status === 'COMPLETED').length || 0;
-        const inProgressCount = teacher.scenarioProgress?.filter((s: any) => s.status === 'IN_PROGRESS').length || 0;
 
         if (statusFilter === 'Completed') return completedCount === 4;
-        if (statusFilter === 'In Progress') return inProgressCount > 0;
-        if (statusFilter === 'Not Started') return completedCount === 0 && inProgressCount === 0;
+        if (statusFilter === 'Not Started') return completedCount === 0;
 
         return true;
     });
@@ -68,7 +66,7 @@ const AdminDashboard = () => {
     const avgProgress = totalTeachers > 0
         ? Math.round(teachers.reduce((acc: number, t: any) => acc + (t.scenarioProgress?.filter((s: any) => s.status === 'COMPLETED').length || 0), 0) / (totalTeachers * 4) * 100)
         : 0;
-    const activeTeachers = teachers.filter((t: any) => t.scenarioProgress?.some((s: any) => s.status === 'IN_PROGRESS')).length;
+    const activeTeachers = 0; // No longer tracking IN_PROGRESS status
 
     // Helper function to get last activity date
     const getLastActivity = (teacher: any) => {
@@ -158,7 +156,7 @@ const AdminDashboard = () => {
                     </div>
 
                     <div className="flex items-center gap-1.5 p-1.5 bg-gray-50/80 rounded-2xl border border-gray-100/50 w-fit">
-                        {(['All', 'In Progress', 'Completed', 'Not Started'] as const).map((filter) => (
+                        {(['All', 'Completed', 'Not Started'] as const).map((filter) => (
                             <button
                                 key={filter}
                                 onClick={() => setStatusFilter(filter)}
@@ -242,8 +240,7 @@ const AdminDashboard = () => {
                                                                             className={cn(
                                                                                 "w-3.5 h-3.5 rounded-full transition-all duration-300 ring-4 ring-white shadow-sm",
                                                                                 status === 'COMPLETED' ? 'bg-green-500 shadow-green-100/50' :
-                                                                                    status === 'IN_PROGRESS' ? 'bg-blue-500 animate-pulse shadow-blue-100/50' :
-                                                                                        'bg-gray-200'
+                                                                                    'bg-gray-200'
                                                                             )}
                                                                             title={`Scenario ${sid}: ${status}`}
                                                                         />
@@ -332,8 +329,7 @@ const AdminDashboard = () => {
                                                                 className={cn(
                                                                     "w-4 h-4 rounded-full ring-4 ring-white shadow-sm",
                                                                     status === 'COMPLETED' ? 'bg-green-500' :
-                                                                        status === 'IN_PROGRESS' ? 'bg-blue-500 animate-pulse' :
-                                                                            'bg-gray-200'
+                                                                        'bg-gray-200'
                                                                 )}
                                                             />
                                                         );

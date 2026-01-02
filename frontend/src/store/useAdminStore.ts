@@ -28,7 +28,7 @@ interface AdminState {
 interface ScenarioAttemptResponse {
     id: number;
     scenarioId: string;
-    status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
+    status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED'; // Backend may still return IN_PROGRESS from old data
     score: number | null;
     session_id: string | null;
     evaluation: EvaluationData | null;
@@ -67,7 +67,7 @@ export const useAdminStore = create<AdminState>((set) => ({
                 role: t.role.toUpperCase() as 'TEACHER' | 'ADMIN',
                 scenarioProgress: t.scenarioAttempts.map((a: ScenarioAttemptResponse) => ({
                     scenarioId: a.scenarioId,
-                    status: a.status as 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED',
+                    status: (a.status === 'IN_PROGRESS' ? 'NOT_STARTED' : a.status) as 'NOT_STARTED' | 'COMPLETED',
                     score: a.score,
                     session_id: a.session_id,
                     evaluation: a.evaluation,
@@ -109,7 +109,7 @@ export const useAdminStore = create<AdminState>((set) => ({
                 role: t.role.toUpperCase() as 'TEACHER' | 'ADMIN',
                 scenarioProgress: t.scenarioAttempts.map((a: ScenarioAttemptResponse) => ({
                     scenarioId: a.scenarioId,
-                    status: a.status as 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED',
+                    status: (a.status === 'IN_PROGRESS' ? 'NOT_STARTED' : a.status) as 'NOT_STARTED' | 'COMPLETED',
                     score: a.score,
                     session_id: a.session_id,
                     evaluation: a.evaluation,

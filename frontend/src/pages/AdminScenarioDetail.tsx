@@ -86,7 +86,7 @@ const AdminScenarioDetail = () => {
                     <div>
                         <h2 className="text-xl font-bold text-gray-900">Scenario {scenarioId}</h2>
                         <p className="text-sm text-gray-500">
-                            {isCompleted ? 'Completed' : status === 'IN_PROGRESS' ? 'In Progress' : 'Not Started'}
+                            {isCompleted ? 'Completed' : 'Not Started'}
                         </p>
                     </div>
                 </div>
@@ -98,7 +98,7 @@ const AdminScenarioDetail = () => {
                     <AlertCircle className="w-12 h-12 text-amber-600 mx-auto mb-4" />
                     <h3 className="text-lg font-bold text-amber-900 mb-2">Scenario Not Completed</h3>
                     <p className="text-amber-700">
-                        This scenario is {status === 'IN_PROGRESS' ? 'currently in progress' : 'not started yet'}.
+                        This scenario is not started yet.
                         {scenario.created_at && (
                             <span className="block mt-2 text-sm">
                                 Started: {formatDate(scenario.created_at)}
