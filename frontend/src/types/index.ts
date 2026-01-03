@@ -30,8 +30,10 @@ export interface TeacherProfile extends User {
     institution?: string;
     scenarioProgress: {
         scenarioId: string;
-        status: 'NOT_STARTED' | 'COMPLETED';
+        status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
         score?: number | null;
+        completedAttempts?: number;
+        requiredAttempts?: number;
         session_id?: string | null;
         evaluation?: EvaluationData | null;
         created_at?: string;
@@ -46,11 +48,14 @@ export interface Scenario {
     id: string;
     title: string;
     description: string;
-    status: 'NOT_STARTED' | 'COMPLETED';
+    status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
     difficulty?: string;
-    score?: number;
+    score?: number | null;
     toughTongueId?: string;
     customEmbedUrl?: string;
+    completedAttempts?: number;
+    requiredAttempts?: number;
+    isLocked?: boolean;
 }
 
 export interface AuthState {

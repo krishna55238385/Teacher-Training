@@ -13,7 +13,7 @@ interface ScenarioState {
     syncWithBackend: (id: string, status: Scenario['status'], score?: number) => Promise<void>;
 }
 
-const INITIAL_SCENARIOS: Scenario[] = [
+const INITIAL_SCENARIOS: (Scenario & { requiredAttempts: number; completedAttempts: number })[] = [
     {
         id: '1',
         title: 'PTM Assessment: Handling Parent Concerns',
@@ -22,24 +22,8 @@ const INITIAL_SCENARIOS: Scenario[] = [
         status: 'NOT_STARTED',
         toughTongueId: '693877e7b8892d3f7b91eb31',
         customEmbedUrl: 'https://bambinos.app.toughtongueai.com/embed/693877e7b8892d3f7b91eb31?skipPrecheck=true',
-    },
-    {
-        id: '2',
-        title: 'PTM Coach: Framework Mastery',
-        description: 'Master the structural framework for conducting effective PTMs. Focus on the "Sandwich Method" of feedback and setting actionable goals.',
-        difficulty: 'Advanced',
-        status: 'NOT_STARTED',
-        toughTongueId: '6939d23e07d90d92fea80199',
-        customEmbedUrl: 'https://bambinos.app.toughtongueai.com/embed/6939d23e07d90d92fea80199?skipPrecheck=true',
-    },
-    {
-        id: '3',
-        title: 'Renewal Roleplay: Hesitant Parent (English Communication)',
-        description: 'Roleplay a renewal conversation with a parent hesitant due to perceived lack of improvement in English communication skills. Address objections convincingly.',
-        difficulty: 'Advanced',
-        status: 'NOT_STARTED',
-        toughTongueId: '693a7c1507d90d92fea80744',
-        customEmbedUrl: 'https://bambinos.app.toughtongueai.com/embed/693a7c1507d90d92fea80744?skipPrecheck=true',
+        requiredAttempts: 2, // 1 at start + 1 at end
+        completedAttempts: 0
     },
     {
         id: '4',
@@ -49,6 +33,30 @@ const INITIAL_SCENARIOS: Scenario[] = [
         status: 'NOT_STARTED',
         toughTongueId: '6942c17a25f8fcc9bc250d03',
         customEmbedUrl: 'https://bambinos.app.toughtongueai.com/embed/6942c17a25f8fcc9bc250d03?skipPrecheck=true',
+        requiredAttempts: 2,
+        completedAttempts: 0
+    },
+    {
+        id: '2',
+        title: 'PTM Coach: Framework Mastery',
+        description: 'Master the structural framework for conducting effective PTMs. Focus on the "Sandwich Method" of feedback and setting actionable goals.',
+        difficulty: 'Advanced',
+        status: 'NOT_STARTED',
+        toughTongueId: '6939d23e07d90d92fea80199',
+        customEmbedUrl: 'https://bambinos.app.toughtongueai.com/embed/6939d23e07d90d92fea80199?skipPrecheck=true',
+        requiredAttempts: 2,
+        completedAttempts: 0
+    },
+    {
+        id: '3',
+        title: 'Renewal Roleplay: Hesitant Parent (English Communication)',
+        description: 'Roleplay a renewal conversation with a parent hesitant due to perceived lack of improvement in English communication skills. Address objections convincingly.',
+        difficulty: 'Advanced',
+        status: 'NOT_STARTED',
+        toughTongueId: '693a7c1507d90d92fea80744',
+        customEmbedUrl: 'https://bambinos.app.toughtongueai.com/embed/693a7c1507d90d92fea80744?skipPrecheck=true',
+        requiredAttempts: 2,
+        completedAttempts: 0
     },
 ];
 
@@ -83,9 +91,32 @@ export const useScenarioStore = create<ScenarioState>()(
             },
             updateScenarioStatus: (id: string, status: Scenario['status'], score?: number) => {
                 set((state: ScenarioState) => ({
-                    scenarios: state.scenarios.map((s: Scenario) =>
-                        s.id === id ? { ...s, status, score } : s
-                    ),
+                    scenarios: state.scenarios.map((s: Scenario) => {
+                        if (s.id === id) {
+                            // Only increment if this is a new completion
+                            const currentCompleted = (s as Scenario & { completedAttempts?: number }).completedAttempts || 0;
+                            const requiredAttempts = (s as Scenario & { requiredAttempts?: number }).requiredAttempts || 1;
+                            let newCompleted = currentCompleted;
+                            
+                            // If status is COMPLETED and we haven't reached required attempts, increment
+                            if (status === 'COMPLETED' && currentCompleted < requiredAttempts) {
+                                newCompleted = currentCompleted + 1;
+                            }
+                            
+                            const isFullyCompleted = newCompleted >= requiredAttempts;
+                            const newStatus: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' = isFullyCompleted 
+                                ? 'COMPLETED' 
+                                : (newCompleted > 0 ? 'IN_PROGRESS' : status);
+                            
+                            return { 
+                                ...s, 
+                                status: newStatus as Scenario['status'],
+                                score: score !== undefined ? score : s.score,
+                                completedAttempts: newCompleted
+                            };
+                        }
+                        return s;
+                    }),
                 }));
             },
             syncWithBackend: async (id: string, status: Scenario['status'], score?: number) => {
