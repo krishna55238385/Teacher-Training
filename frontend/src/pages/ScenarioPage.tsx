@@ -17,10 +17,11 @@ const ScenarioPage = () => {
 
     const scenario = scenarios.find((s: Scenario) => s.id === id);
 
-    const [sessionState, setSessionState] = React.useState<'intro' | 'active' | 'completed'>('intro');
+    const [sessionState, setSessionState] = React.useState<'intro' | 'active' | 'completed' | 'processing'>('intro');
     const [accessToken, setAccessToken] = React.useState<string | null>(null);
     const [isLoadingToken, setIsLoadingToken] = React.useState(false);
     const [lastScore, setLastScore] = React.useState<number | null>(null);
+    const [, setIsSubmitting] = React.useState(false);
 
     // Initialize state based on scenario status
     React.useEffect(() => {
@@ -34,9 +35,17 @@ const ScenarioPage = () => {
         console.log('🚀 handleSessionComplete called with sessionId:', sessionId);
         console.log('📋 Current scenario id:', id);
         
+        // Show processing state immediately
+        setIsSubmitting(true);
+        setSessionState('processing');
+        
+        const startTime = Date.now();
+        const minDisplayTime = 500; // Minimum time to show processing screen (ms)
+        
         try {
             // Try to notify backend to fetch results and trigger evaluation
             let score: number | null = null;
+            let progressData: { status?: Scenario['status']; score?: number; attempt?: { status?: Scenario['status']; score?: number } } | null = null;
             
             try {
                 console.log('📡 Making API call to /scenarios/submit...');
@@ -51,6 +60,7 @@ const ScenarioPage = () => {
                 
                 if (response.data.success) {
                     score = response.data.score ?? null;
+                    progressData = response.data.progress || response.data.attempt;
                     setLastScore(score);
                     
                     // Update local state with backend response
@@ -70,16 +80,39 @@ const ScenarioPage = () => {
                 updateScenarioStatus(id!, 'COMPLETED', score ?? undefined);
             }
 
-            // Redirect immediately to dashboard after completion
-            navigate('/dashboard');
+            // Wait for minimum display time if backend was fast
+            const elapsed = Date.now() - startTime;
+            const remainingTime = Math.max(0, minDisplayTime - elapsed);
+            
+            setTimeout(() => {
+                // Redirect to dashboard with success state
+                navigate('/dashboard', { 
+                    state: { 
+                        showSuccess: true, 
+                        scenarioTitle: scenario?.title,
+                        score: score,
+                        progress: progressData
+                    } 
+                });
+            }, remainingTime);
         } catch (error) {
             console.error('Failed to process session completion:', error);
             // Fallback: still mark as completed and redirect even if everything fails
             updateScenarioStatus(id!, 'COMPLETED');
-            // Redirect immediately
-            navigate('/dashboard');
+            
+            // Still redirect after minimum time
+            setTimeout(() => {
+                navigate('/dashboard', { 
+                    state: { 
+                        showSuccess: true,
+                        scenarioTitle: scenario?.title
+                    } 
+                });
+            }, minDisplayTime);
+        } finally {
+            setIsSubmitting(false);
         }
-    }, [id, navigate, updateScenarioStatus]);
+    }, [id, navigate, updateScenarioStatus, scenario]);
 
     // Handle Iframe Messages
     React.useEffect(() => {
@@ -212,6 +245,36 @@ const ScenarioPage = () => {
                         </Button>
                     </CardFooter>
                 </Card>
+            </div>
+        );
+    }
+
+    if (sessionState === 'processing') {
+        return (
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
+                <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center">
+                    <div className="mb-6">
+                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-blue-100 mb-4">
+                            <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Processing Your Results</h2>
+                        <p className="text-gray-600">Please wait while we analyze your performance...</p>
+                    </div>
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Evaluating your responses</span>
+                        </div>
+                        <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Calculating your score</span>
+                        </div>
+                        <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Updating your progress</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
