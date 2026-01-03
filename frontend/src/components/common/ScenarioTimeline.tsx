@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { CheckCircle, FileText } from 'lucide-react';
 
 interface Scenario {
+    id?: string;
     title: string;
     status: string;
 }
@@ -48,11 +49,12 @@ const ScenarioTimeline = ({ scenarios, currentScenarioIndex, teacherId, isSummar
                 {scenarios.map((scenario, idx) => {
                     const isCompleted = scenario.status === 'COMPLETED';
                     const isCurrent = idx === currentScenarioIndex && !isSummary;
+                    const scenarioId = scenario.id || idx.toString();
 
                     return (
                         <button
-                            key={idx}
-                            onClick={() => navigate(`/admin/teacher/${teacherId}/scenario/${idx}`)}
+                            key={scenarioId}
+                            onClick={() => navigate(`/admin/teacher/${teacherId}/scenario/${scenarioId}`)}
                             className={cn(
                                 "relative px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 whitespace-nowrap min-w-fit outline-none focus:outline-none",
                                 isCurrent ? "text-white" : "text-gray-500 hover:text-gray-900"

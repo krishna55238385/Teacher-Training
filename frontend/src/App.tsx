@@ -12,6 +12,7 @@ import DashboardLayout from './components/layout/DashboardLayout';
 import StudentDiary from './pages/StudentDiary';
 import AdminScenarioDetail from './pages/AdminScenarioDetail';
 import AdminOverallResult from './pages/AdminOverallResult';
+import AdminAllAttempts from './pages/AdminAllAttempts';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
               <Route index element={<Navigate to="scenario/summary" replace />} />
               <Route path="scenario/summary" element={<AdminOverallResult />} />
               <Route path="scenario/:scenarioId" element={<AdminScenarioDetail />} />
+              <Route path="attempts" element={<AdminAllAttempts />} />
             </Route>
           </Route>
         </Route>

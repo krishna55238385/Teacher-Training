@@ -30,6 +30,7 @@ export interface TeacherProfile extends User {
     institution?: string;
     scenarioProgress: {
         scenarioId: string;
+        attemptNumber?: number;
         status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
         score?: number | null;
         completedAttempts?: number;
