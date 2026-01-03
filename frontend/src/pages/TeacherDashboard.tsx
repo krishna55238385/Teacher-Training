@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import { useScenarioStore } from '../store/useScenarioStore';
-import { ArrowRight, Mic, Brain, MessageCircle, Sparkles, Target, Star, Lock, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Mic, Brain, MessageCircle, Sparkles, Target, Star, Lock } from 'lucide-react';
 import { Card } from '../components/common/Card';
 import { cn } from '../utils/cn';
 import { useToast } from '../hooks/useToast';
@@ -22,7 +22,6 @@ const TeacherDashboard = () => {
     const { scenarios, isLoading, fetchScenarios, initializeScenarios } = useScenarioStore();
     const location = useLocation();
     const { toasts, removeToast, success } = useToast();
-    const [isRefreshing, setIsRefreshing] = React.useState(false);
 
     // Show success message if redirected from scenario completion
     React.useEffect(() => {
@@ -43,13 +42,10 @@ const TeacherDashboard = () => {
     React.useEffect(() => {
         // Fetch scenarios from backend on mount
         const loadScenarios = async () => {
-            setIsRefreshing(true);
             try {
                 await fetchScenarios();
             } catch {
                 initializeScenarios();
-            } finally {
-                setIsRefreshing(false);
             }
         };
         loadScenarios();

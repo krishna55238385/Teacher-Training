@@ -157,13 +157,17 @@ const AdminAllAttempts = () => {
                                                                 Strengths
                                                             </h4>
                                                             <ul className="text-sm text-green-900 space-y-1">
-                                                                {Array.isArray(evaluation.strengths || evaluation.strength_points)
-                                                                    ? (evaluation.strengths || evaluation.strength_points || []).map((s: string, i: number) => (
-                                                                          <li key={i}>• {s}</li>
-                                                                      ))
-                                                                    : typeof (evaluation.strengths || evaluation.strength_points) === 'string' && (
-                                                                          <li>• {evaluation.strengths || evaluation.strength_points}</li>
-                                                                      )}
+                                                                {(() => {
+                                                                    const strengthsData = evaluation.strengths || evaluation.strength_points;
+                                                                    if (Array.isArray(strengthsData)) {
+                                                                        return strengthsData.map((s: string, i: number) => (
+                                                                            <li key={i}>• {s}</li>
+                                                                        ));
+                                                                    } else if (typeof strengthsData === 'string') {
+                                                                        return <li>• {strengthsData}</li>;
+                                                                    }
+                                                                    return null;
+                                                                })()}
                                                             </ul>
                                                         </div>
                                                     )}
@@ -176,13 +180,17 @@ const AdminAllAttempts = () => {
                                                                 Areas for Improvement
                                                             </h4>
                                                             <ul className="text-sm text-blue-900 space-y-1">
-                                                                {Array.isArray(evaluation.weaknesses || evaluation.improvement_areas)
-                                                                    ? (evaluation.weaknesses || evaluation.improvement_areas || []).map((w: string, i: number) => (
-                                                                          <li key={i}>• {w}</li>
-                                                                      ))
-                                                                    : typeof (evaluation.weaknesses || evaluation.improvement_areas) === 'string' && (
-                                                                          <li>• {evaluation.weaknesses || evaluation.improvement_areas}</li>
-                                                                      )}
+                                                                {(() => {
+                                                                    const weaknessesData = evaluation.weaknesses || evaluation.improvement_areas;
+                                                                    if (Array.isArray(weaknessesData)) {
+                                                                        return weaknessesData.map((w: string, i: number) => (
+                                                                            <li key={i}>• {w}</li>
+                                                                        ));
+                                                                    } else if (typeof weaknessesData === 'string') {
+                                                                        return <li>• {weaknessesData}</li>;
+                                                                    }
+                                                                    return null;
+                                                                })()}
                                                             </ul>
                                                         </div>
                                                     )}
