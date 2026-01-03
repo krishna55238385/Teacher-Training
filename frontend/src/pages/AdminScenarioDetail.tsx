@@ -1,8 +1,16 @@
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useAdminStore } from '../store/useAdminStore';
 import { Play, CheckCircle2, AlertCircle, Star } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { motion } from 'framer-motion';
+
+const SCENARIO_NAMES: Record<string, string> = {
+    '1': 'PTM Assessment: Handling Parent Concerns',
+    '2': 'PTM Coach: Framework Mastery',
+    '3': 'Renewal Roleplay: Hesitant Parent (English Communication)',
+    '4': 'Coach: The Perfect Renewal Call'
+};
 
 const AdminScenarioDetail = () => {
     const { id, scenarioId } = useParams<{ id: string; scenarioId: string }>();
@@ -12,15 +20,27 @@ const AdminScenarioDetail = () => {
     if (!teacher) return <div className="text-center p-8">Teacher not found</div>;
     if (!scenarioId) return <div className="text-center p-8">Scenario ID is required</div>;
 
-    const scenario = teacher.scenarioProgress.find(s => s.scenarioId === scenarioId);
+    // Get ALL attempts for this scenario (not just the first one)
+    const allAttempts = teacher.scenarioProgress.filter(s => s.scenarioId === scenarioId);
     
-    if (!scenario) {
+    if (allAttempts.length === 0) {
         return (
             <div className="text-center p-8">
                 <p className="text-gray-600">Scenario {scenarioId} not found for this teacher</p>
             </div>
         );
     }
+
+    // Sort attempts by attempt number
+    const sortedAttempts = [...allAttempts].sort((a, b) => {
+        const aNum = a.attemptNumber || 0;
+        const bNum = b.attemptNumber || 0;
+        return aNum - bNum;
+    });
+
+    // State to track selected attempt (default to latest)
+    const [selectedAttemptIndex, setSelectedAttemptIndex] = React.useState(sortedAttempts.length - 1);
+    const scenario = sortedAttempts[selectedAttemptIndex];
 
     const evaluation = scenario.evaluation || {};
     const score = scenario.score ?? 0;
@@ -70,6 +90,8 @@ const AdminScenarioDetail = () => {
     // Calculate percentile (mock for now, can be calculated from batch data)
     const percentile = score >= 8 ? 85 : score >= 6 ? 70 : score >= 4 ? 50 : 30;
 
+    const scenarioName = SCENARIO_NAMES[scenarioId] || `Scenario ${scenarioId}`;
+
     return (
         <div className="space-y-6 animate-fadeIn">
             {/* Header Section */}
@@ -84,7 +106,7 @@ const AdminScenarioDetail = () => {
                         <Star className="w-6 h-6 fill-current" />
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900">Scenario {scenarioId}</h2>
+                        <h2 className="text-xl font-bold text-gray-900">{scenarioName}</h2>
                         <p className="text-sm text-gray-500">
                             {isCompleted ? 'Completed' : 'Not Started'}
                         </p>
@@ -92,6 +114,54 @@ const AdminScenarioDetail = () => {
                 </div>
                 <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded text-xs font-semibold">Read Only</span>
             </motion.div>
+
+            {/* Attempt Selector - Show only if multiple attempts exist */}
+            {sortedAttempts.length > 1 && (
+                <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                        <span className="text-sm font-bold text-gray-700">Select Attempt:</span>
+                        <span className="text-xs text-gray-500">
+                            ({sortedAttempts.length} attempt{sortedAttempts.length !== 1 ? 's' : ''} available)
+                        </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        {sortedAttempts.map((attempt, idx) => {
+                            const attemptNum = attempt.attemptNumber || (idx + 1);
+                            const isSelected = idx === selectedAttemptIndex;
+                            const isCompleted = attempt.status === 'COMPLETED';
+                            
+                            return (
+                                <button
+                                    key={attempt.session_id || idx}
+                                    onClick={() => setSelectedAttemptIndex(idx)}
+                                    className={cn(
+                                        "px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2",
+                                        isSelected
+                                            ? "bg-blue-600 text-white shadow-md"
+                                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                    )}
+                                >
+                                    {isCompleted && (
+                                        <CheckCircle2 className={cn(
+                                            "w-4 h-4",
+                                            isSelected ? "text-blue-100" : "text-green-600"
+                                        )} />
+                                    )}
+                                    Attempt #{attemptNum}
+                                    {attempt.score && (
+                                        <span className={cn(
+                                            "text-xs px-2 py-0.5 rounded",
+                                            isSelected ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"
+                                        )}>
+                                            {attempt.score}%
+                                        </span>
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
 
             {!isCompleted ? (
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-8 text-center">

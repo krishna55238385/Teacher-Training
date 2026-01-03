@@ -3,10 +3,18 @@ import { useParams, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAdminStore } from '../store/useAdminStore';
 import Button from '../components/common/Button';
 import ScenarioTimeline from '../components/common/ScenarioTimeline';
-import { MOCK_SCENARIO_RESULTS } from '../data/mockData';
 import {
-    ArrowLeft, Mail, Phone, Calendar
+    ArrowLeft, Mail, Phone, Calendar, FileText
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+// Real scenario names mapping
+const SCENARIO_NAMES: Record<string, string> = {
+    '1': 'PTM Assessment: Handling Parent Concerns',
+    '2': 'PTM Coach: Framework Mastery',
+    '3': 'Renewal Roleplay: Hesitant Parent',
+    '4': 'Coach: The Perfect Renewal Call'
+};
 
 const TeacherDetailPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -29,10 +37,27 @@ const TeacherDetailPage = () => {
         return <div className="text-center p-8">Teacher not found</div>;
     }
 
-    // Determine current scenario index
+    // Build scenarios from teacher's actual progress
+    const scenarioIds = ['1', '4', '2', '3']; // Order: Assessment, Renewal Call, Framework, Roleplay
+    const scenarios = scenarioIds.map(scenarioId => {
+        const attempts = teacher.scenarioProgress.filter(p => p.scenarioId === scenarioId);
+        const completedAttempts = attempts.filter(a => a.status === 'COMPLETED');
+        const isCompleted = completedAttempts.length > 0;
+        
+        return {
+            id: scenarioId,
+            title: SCENARIO_NAMES[scenarioId] || `Scenario ${scenarioId}`,
+            status: isCompleted ? 'COMPLETED' : 'NOT_STARTED'
+        };
+    });
+
+    // Determine current scenario
     const isSummary = location.pathname.includes('/scenario/summary');
     const scenarioMatch = location.pathname.match(/\/scenario\/(\d+)/);
-    const currentScenarioIndex = scenarioMatch ? parseInt(scenarioMatch[1]) : undefined;
+    const currentScenarioId = scenarioMatch ? scenarioMatch[1] : undefined;
+    const currentScenarioIndex = currentScenarioId 
+        ? scenarioIds.indexOf(currentScenarioId)
+        : undefined;
 
     return (
         <div className="min-h-screen bg-[#F8F9FC] font-sans">
@@ -71,6 +96,12 @@ const TeacherDetailPage = () => {
                             </div>
                         </div>
                         <div className="flex gap-3">
+                            <Link to={`/admin/teacher/${id}/attempts`}>
+                                <Button className="bg-white text-blue-600 hover:bg-blue-50 border-none shadow-lg gap-2">
+                                    <FileText className="w-4 h-4" />
+                                    View All Attempts
+                                </Button>
+                            </Link>
                             <Button className="bg-white text-blue-600 hover:bg-blue-50 border-none shadow-lg">
                                 View Resume
                             </Button>
@@ -82,10 +113,20 @@ const TeacherDetailPage = () => {
             {/* Main Content Overlapping Header */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 pb-12 relative z-20">
 
+                {/* Quick Action Bar */}
+                <div className="mb-6 flex justify-end">
+                    <Link to={`/admin/teacher/${id}/attempts`}>
+                        <Button className="bg-blue-600 text-white hover:bg-blue-700 shadow-lg gap-2">
+                            <FileText className="w-4 h-4" />
+                            View All Attempts & Feedback
+                        </Button>
+                    </Link>
+                </div>
+
                 {/* Timeline Card */}
                 <div>
                     <ScenarioTimeline
-                        scenarios={MOCK_SCENARIO_RESULTS}
+                        scenarios={scenarios}
                         teacherId={teacher.id}
                         currentScenarioIndex={currentScenarioIndex}
                         isSummary={isSummary}
